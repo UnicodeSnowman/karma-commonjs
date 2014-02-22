@@ -13,7 +13,7 @@ function require(requiringFile, dependency) {
     dependency = normalizePath(requiringFile, dependency, window.__cjs_modules_root__ || '');
 
     // find module
-    var moduleFn = window.__cjs_module__[dependency];
+    var moduleFn = window.__cjs_module__[dependency] || window.__cjs_module_browserify__[dependency];
     if (moduleFn === undefined) throw new Error("Could not find module '" + dependency + "' from '" + requiringFile + "'");
 
     // run the module (if necessary)
@@ -35,6 +35,7 @@ function requireFn(basepath) {
 function normalizePath(basePath, relativePath, modulesRoot) {
 
     if (isFullPath(relativePath)) return relativePath;
+    if (isBrowserifyModulePath(relativePath)) return relativePath;
     if (isNpmModulePath(relativePath)) basePath = modulesRoot;
     if (!isFullPath(basePath)) throw new Error("basePath should be full path, but was [" + basePath + "]");
 
@@ -74,4 +75,9 @@ function normalizePath(basePath, relativePath, modulesRoot) {
     function isNpmModulePath(path) {
       return path.charAt(0) !== ".";
     }
+
+    function isBrowserifyModulePath (path) {
+        return window.__cjs_module_browserify__[path];
+    }
+
 }
